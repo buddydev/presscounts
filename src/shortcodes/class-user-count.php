@@ -61,7 +61,7 @@ class User_Count {
 
 		$class = 'pcounts-total-users ' . $atts['class'];
 
-		return sprintf( '<span class="%s">%d</span>', esc_attr( $class ), number_format( $this->get_count(), 0, '.', $atts['sep'] ) );
+		return sprintf( '<span class="%s">%s</span>', esc_attr( $class ), number_format( $this->get_count(), 0, '.', $atts['sep'] ) );
 	}
 
 	/**
