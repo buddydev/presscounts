@@ -38,6 +38,8 @@ class User_Count {
 		add_action( 'delete_user', array( $this, 'clear_cache' ) );
 		add_action( 'make_spam_user', array( $this, 'clear_cache' ) );
 		add_action( 'make_ham_user', array( $this, 'clear_cache' ) );
+		add_action( 'set_user_role', array( $this, 'clear_cache' ) );
+		add_action( 'remove_user_role', array( $this, 'clear_cache' ) );
 	}
 
 	/**
@@ -54,14 +56,21 @@ class User_Count {
 		$atts = shortcode_atts(
 			array(
 				'class' => '',
-				'sep'   => ',', // thosand separator.
+				'sep'   => ',', // thousand separator.
+				'role'  => '',
 			),
 			$atts
 		);
 
 		$class = 'pcounts-total-users ' . $atts['class'];
 
-		return sprintf( '<span class="%s">%s</span>', esc_attr( $class ), number_format( $this->get_count(), 0, '.', $atts['sep'] ) );
+		if ( $atts['role'] ) {
+			$count = $this->get_count_by_role( $atts['role'] );
+		} else {
+			$count = $this->get_total_count();
+		}
+
+		return sprintf( '<span class="%s">%s</span>', esc_attr( $class ), number_format( $count, 0, '.', $atts['sep'] ) );
 	}
 
 	/**
@@ -71,22 +80,45 @@ class User_Count {
 	 */
 	private function get_count() {
 
-		$count = get_transient( 'presscounts_total_users_count' );
+		$count = get_transient( 'presscounts_users_count' );
 		if ( false === $count ) {
 			// re count.
-			$user_counts = count_users();
-			$count     = $user_counts['total_users'];
-			set_transient( 'presscounts_total_users_count', $count, DAY_IN_SECONDS );
+			$count = count_users();
+			set_transient( 'presscounts_users_count', $count, DAY_IN_SECONDS );
 		}
 
 		return $count;
 	}
 
 	/**
+	 * Get total count.
+	 *
+	 * @return int
+	 */
+	private function get_total_count() {
+		$count = $this->get_count();
+
+		return isset( $count['total_users'] ) ? $count['total_users'] : 0;
+	}
+
+	/**
+	 * Get count by role.
+	 *
+	 * @param string $role role name.
+	 *
+	 * @return int
+	 */
+	private function get_count_by_role( $role ) {
+		$count = $this->get_count();
+
+		return isset( $count['avail_roles'][ $role ] ) ? $count['avail_roles'][ $role ] : 0;
+
+	}
+
+	/**
 	 * Clear cache.
 	 */
 	public function clear_cache() {
-		delete_transient( 'presscounts_total_users_count' );
+		delete_transient( 'presscounts_users_count' );
 	}
 }
-

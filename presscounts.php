@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: PressCounts
- * Version: 1.0.0
+ * Version: 1.0.1
  * Plugin URI: https://buddydev.com/plugins/wp-count-all
  * Description: Count things in WordPress
  * Author: BuddyDev
@@ -38,7 +38,7 @@ class PressCounts {
 	 *
 	 * @var string
 	 */
-	private $version = '1.0.0';
+	private $version = '1.0.1';
 
 	/**
 	 * Class instance
